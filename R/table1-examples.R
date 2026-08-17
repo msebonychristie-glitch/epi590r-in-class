@@ -81,4 +81,32 @@ tbl_summary(
   # add a caption
   modify_caption("**Participant characteristics**")
 
+tbl_summary(nlsy,include=c(region_cat, race_eth_cat,
+														income, starts_with ("sleep")),
+						by=sex_cat,
+						digits=list (income ~3, starts_with ("sleep")~1),
+						statistic=list (income ~ "{p10}, {p90}", starts_with("sleep")~ "{min},{max}"),
+						label = list(	race_eth_cat ~ "Race/ethnicity",
+													region_cat ~ "Region",
+													income ~ "income",
+													sleep_wkdy ~ "Sleep on Weekdays",
+													sleep_wknd~ "Sleep on Weekends"),
+						missing_text = ("missing" ) |>
+
+	#change the test used to compare sex_cat groups
+	add_p(test = list(
+		all_continuous() ~ "t.test",
+		all_categorical() ~ "chisq.test"
+		)) |>
+# add a total column with the number of observations
+	add_overall(col_label = "**Total** N = {N}") |>
+# add footnote associated with the grade label within the label column
+modify_footnote_body(
+	footnote = " https://www.nlsinfo.org/content/cohorts/nlsy79/topical-guide/household/race-ethnicity-immigration-data",
+	columns = "label",
+	rows = variable == "race_eth_cat" & row_type == "label")
+
+#For the income variable, show the 10th and 90th percentiles of income with 3
+#digits, and for the sleep variables, show the min and the max with 1 digit.
+
 
